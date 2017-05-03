@@ -51,3 +51,18 @@ def get_repo_commits(repository_owner, repository_name):
     result = api_get(repo_commit_url, params)
     return result
 
+def return_active_repositories(repository_owner):
+    repositories = get_user_repos(repository_owner)
+    result = []
+    for repository in repositories:
+        result.append(get_repo_commits(repository_owner, repository))
+    return result
+
+
+def process_repo_commits(repo_commit_results):
+    len([commit for commit in repo_commit_results])
+# print(return_active_repositories(username))
+
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(get_repo_commits(username, 'helloworld-express'))
