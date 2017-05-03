@@ -49,7 +49,7 @@ class User:
         result = api_get(repo_commit_url, params)
         return result
 
-    def get_user_commit_history(self, repository_owner):
+    def get_user_commit_history(self):
         """Searches a user's github repos and collects/returns their commit history."""
         repositories = self.get_user_repositories()
         result = []
