@@ -41,4 +41,13 @@ def split_repo_name(repo_name):
     repo_tokens = repo_name.split('/')
     return repo_tokens[1]
 
+def get_repo_commits(repository_owner, repository_name):
+    # 2017-05-03T11:30:24.321455
+    # datetime.datetime.now().isoformat()
+    params = {
+        'since': '2017-05-01T11:30:24.321455',
+    }
+    repo_commit_url = 'https://api.github.com/repos/' + repository_owner + '/' + repository_name + '/commits'
+    result = api_get(repo_commit_url, params)
+    return result
 
