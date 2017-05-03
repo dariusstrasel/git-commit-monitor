@@ -20,20 +20,20 @@ class User:
 
     def __init__(self, username):
         self.username = username
-        self.user_repos = self.get_user_repos()
+        self.user_repos = self.get_user_repositories()
 
-    def get_user_repos(self):
+    def get_user_repositories(self) -> list:
         repo_owner = self.username
         repo_url = 'https://api.github.com/users/' + repo_owner + '/repos'
         result = api_get(repo_url, None)
-        return [self.split_repo_name(repo_name['full_name']) for repo_name in result]
+        return [self.split_repository_name(repo_name['full_name']) for repo_name in result]
 
     @staticmethod
-    def split_repo_name(repo_name):
+    def split_repository_name(repo_name):
         repo_tokens = repo_name.split('/')
         return repo_tokens[1]
 
-    def get_repo_commits(self, repository_name):
+    def get_repository_commits(self, repository_name):
         # 2017-05-03T11:30:24.321455
         # datetime.datetime.now().isoformat()
         repository_owner = self.username
@@ -45,14 +45,14 @@ class User:
         return result
 
     def return_active_repositories(self, repository_owner):
-        repositories = self.get_user_repos()
+        repositories = self.get_user_repositories()
         result = []
         for repository in repositories:
-            result.append(self.get_repo_commits(repository))
+            result.append(self.get_repository_commits(repository))
         return result
 
     @staticmethod
-    def process_repo_commits(repo_commit_results):
+    def process_repository_commits(repo_commit_results):
         len([commit for commit in repo_commit_results])
 
 
