@@ -16,9 +16,12 @@ def main():
 
     user = models.User(args['username'])
 
-
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(user.get_user_commit_history())
+    if user.user_repos:
+        return pp.pprint(len(user.get_user_commit_history()))
+    else:
+        print("No results returned from API.")
+
 
 if __name__ == "__main__":
     main()
