@@ -13,10 +13,12 @@ def main():
     parser.add_argument('username', metavar='github-username', type=str,
                         help='a github username')
     args = vars(parser.parse_args())
-
-    user = models.User(args['username'])
+    user_auth = models.Instance.get_config()
+    user = models.User(args['username'], user_auth)
+    user.get_user_repositories()
 
     pp = pprint.PrettyPrinter(indent=4)
+
     if user.user_repos:
         return pp.pprint(len(user.get_user_commit_history()))
     else:
