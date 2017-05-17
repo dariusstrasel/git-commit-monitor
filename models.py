@@ -19,7 +19,7 @@ class User:
     def get_user_repositories(self) -> list:
         """Finds a user's repositories from their github account."""
         repo_owner = self.username
-        repo_url = 'd' + repo_owner + '/repos'
+        repo_url = 'https://api.github.com/users/' + repo_owner + '/repos'
         parameters = None
         rest_result = self.auth_instance.api_get(repo_url, parameters)
         print([repo_name['full_name'] for repo_name in rest_result])
