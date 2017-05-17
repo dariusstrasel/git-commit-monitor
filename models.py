@@ -126,7 +126,7 @@ class Instance:
             else:
                 return result.json()
         if result.status_code == 403:
-            print("Status return '403', the Github API limit is likely being throttled.")
+            print("API return '403', the Github API limit is likely being throttled.")
             return None
         else:
             print("API Call returned '%s', not '200' status code." % (result.status_code))
