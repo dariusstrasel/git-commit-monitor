@@ -89,6 +89,10 @@ class Instance:
         file.write('auth = False\n')
         file.write('username = "your_github_username"\n')
         file.write('password = "your_github_password"\n')
+        file.write('twilio_sid = ""\n')
+        file.write('twilio_auth = ""\n')
+        file.write('twilio_from = ""\n')
+        file.write('twilio_to = ""\n')
         file.close()
         return self.get_user_config()
 
@@ -114,9 +118,6 @@ class Instance:
         link_tokens = [item.strip() for item in link.split(',')]
         pages = {token.split(';')[0]: token.split(';')[1].strip() for token in link_tokens}
         return pages
-
-    # TODO: Add pagination module, https://stackoverflow.com/questions/33878019/how-to-get-data-from-all-pages-in-github-api-with-python
-
 
     def api_get(self, url, payload):
         """Amorphous API call used to reduce redundant code by creating an interface for input-based API calls."""
