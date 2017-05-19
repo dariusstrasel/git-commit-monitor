@@ -25,7 +25,7 @@ class User:
         if rest_result == '[]' or rest_result == None:
             return []
         else:
-            print([repo_name['full_name'] for repo_name in rest_result])
+            print([repo_name for repo_name in rest_result])
             self.user_repos = [repo_name['name'] for repo_name in rest_result]
 
 
@@ -118,7 +118,10 @@ class Instance:
         print("GET ", result.url, payload)
         try:
             link_header = result.headers.get('link', None)
-            return self.paginate_api_call(url, payload, result)
+            if link_header is not None:
+                return self.paginate_api_call(url, payload, result)
+            else:
+                return result.json()
         except AttributeError:
             return result.json()
 
