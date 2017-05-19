@@ -35,7 +35,8 @@ def main():
     pp = pprint.PrettyPrinter(indent=4)
 
     if user.user_repos:
-        print(user.get_user_commit_history())
+        pp.pprint(user.get_user_commit_history())
+        #print(user.get_user_commit_history())
     else:
         print("No results returned from API.")
 
