@@ -25,7 +25,7 @@ class User:
         if rest_result == '[]' or rest_result == None:
             return []
         else:
-            print([repo_name for repo_name in rest_result])
+           #print([repo_name for repo_name in rest_result])
             self.user_repos = [repo_name['name'] for repo_name in rest_result]
 
 
@@ -41,22 +41,30 @@ class User:
         # 2017-05-03T11:30:24.321455
         # test time: 2017-05-01T11:30:24.321455
         # datetime.datetime.now().isoformat()
-        repository_owner = self.username
         params = {
             'since': (datetime.today() - timedelta(days=3)).isoformat(),
         }
-        repo_commit_url = 'https://api.github.com/repos/' + repository_owner + '/' + repository_name + '/commits'
+        repo_commit_url = 'https://api.github.com/repos/' + self.username + '/' + repository_name + '/commits'
         result = self.auth_instance.api_get(repo_commit_url, params)
-        return result
+        if result is None:
+            pass
+        else:
+            return result
 
     def get_user_commit_history(self):
         """Searches a user's github repos and collects/returns their commit history."""
         self.get_user_repositories()
-        result = []
+        results = []
         if self.user_repos:
             for repository in self.user_repos:
-                result.append(self.get_repository_commits(repository))
-            return result
+                repository_commits = self.get_repository_commits(repository)
+                if repository_commits is not None:
+                    for commit in repository_commits:
+                        results.append(commit['commit'])
+                else:
+                    pass
+            print(len(results))
+            return results
         else:
             return None
 
@@ -115,15 +123,16 @@ class Instance:
         paginate_text = "?page{0}&per_page=100"
         mutated_url = url + paginate_text
         result = self._authenticate_api(mutated_url, payload)
-        print("GET ", result.url, payload)
-        try:
-            link_header = result.headers.get('link', None)
-            if link_header is not None:
-                return self.paginate_api_call(url, payload, result)
-            else:
+        if result:
+            print("GET ", result.url, payload)
+            try:
+                link_header = result.headers.get('link', None)
+                if link_header is not None:
+                    return self.paginate_api_call(url, payload, result)
+                else:
+                    return result.json()
+            except AttributeError:
                 return result.json()
-        except AttributeError:
-            return result.json()
 
     def _authenticate_api(self, url, payload):
         if self.auth_enabled:
