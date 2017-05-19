@@ -22,12 +22,12 @@ class User:
         repo_url = 'https://api.github.com/users/' + repo_owner + '/repos'
         parameters = None
         rest_result = self.auth_instance.api_get(repo_url, parameters)
-        print([repo_name['full_name'] for repo_name in rest_result])
-        if rest_result:
-            self.user_repos = [repo_name['name'] for repo_name in rest_result]
-        else:
-            print("No user repositories found.")
+        if rest_result == '[]' or rest_result == None:
             return []
+        else:
+            print([repo_name['full_name'] for repo_name in rest_result])
+            self.user_repos = [repo_name['name'] for repo_name in rest_result]
+
 
     @staticmethod
     def split_repository_name(repo_name):
@@ -106,29 +106,60 @@ class Instance:
         link_tokens = [item.strip() for item in link.split(',')]
         pages = {token.split(';')[0]: token.split(';')[1].strip() for token in link_tokens}
         return pages
+
     # TODO: Add pagination module, https://stackoverflow.com/questions/33878019/how-to-get-data-from-all-pages-in-github-api-with-python
 
 
     def api_get(self, url, payload):
         """Amorphous API call used to reduce redundant code by creating an interface for input-based API calls."""
-        pagination_attribute = "?page{0}&per_page=100"
-        mutated_url = url + pagination_attribute
+        paginate_text = "?page{0}&per_page=100"
+        mutated_url = url + paginate_text
+        result = self._authenticate_api(mutated_url, payload)
+        print("GET ", result.url, payload)
+        try:
+            link_header = result.headers.get('link', None)
+            return self.paginate_api_call(url, payload, result)
+        except AttributeError:
+            return result.json()
+
+    def _authenticate_api(self, url, payload):
         if self.auth_enabled:
             username = config.username
             password = config.password
-            result = requests.get(mutated_url, params=payload, auth=(username, password))
+            result = self._check_api_errors(requests.get(url, params=payload, auth=(username, password)))
         else:
-            result = requests.get(mutated_url, params=payload)
-        print("GET ", result.url, payload)
-        if result.status_code == 200:
-            if result.text == '[]':
+            result = self._check_api_errors(requests.get(url, params=payload))
+
+        return result
+
+    @staticmethod
+    def _check_api_errors(api_response):
+        if api_response.status_code == 200:
+            if api_response.text == '[]':
                 return None
             else:
-                return result.json()
-        if result.status_code == 403:
+                return api_response
+        if api_response.status_code == 403:
             print("API return '403', the Github API limit is likely being throttled.")
             return None
         else:
-            print("API Call returned '%s', not '200' status code." % (result.status_code))
+            print("API Call returned '%s', not '200' status code." % (api_response.status_code))
             return None
 
+    def paginate_api_call(self, url, payload, first_response):
+        print("GET (paginated)", first_response.url, payload)
+        api_results = []
+        api_results.append(first_response.json())
+        paginate_text = "?page{%s}&per_page=100"
+        counter = 1
+
+        link_header = first_response.headers.get('link', None)
+
+        while link_header is not None:
+            counter += 1
+            pagination_parameter = (paginate_text % (counter))
+            mutated_url = url + pagination_parameter
+            result = self._authenticate_api(mutated_url, payload)
+            link_header = result.headers.get('link', None)
+            api_results.append(result.json())
+        return api_results
