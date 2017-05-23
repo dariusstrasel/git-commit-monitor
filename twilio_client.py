@@ -1,13 +1,12 @@
-import twilio.rest
+from twilio.rest import Client
 import config
-
 
 def main(body_text):
     ACCOUNT_SID = config.twilio_sid
     AUTH_TOKEN = config.twilio_auth
     sms_from = config.twilio_from
     sms_to = config.twilio_to
-    client = twilio.rest.TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+    client = Client(ACCOUNT_SID, AUTH_TOKEN)
 
     def send_sms():
         message = client.messages.create(
