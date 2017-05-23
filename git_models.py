@@ -169,3 +169,17 @@ class Instance:
             link_header = result.headers.get('link', None)
             api_results.append(result.json())
         return api_results
+
+
+"""aws lambda create-function \
+--region us-east-1 \
+--function-name GitCommitMonitor \
+--zip-file fileb://GitCommitMonitor.zip \
+--role role-arn \
+--handler GitCommitMonitor.main \
+--runtime runtime-value \
+--profile Alkarion
+
+aws lambda update-function-code \
+--function-name GitCommitMonitor \
+--zip-file file://GitCommitMonitor.zip"""
