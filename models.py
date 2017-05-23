@@ -1,11 +1,11 @@
 import requests
 from datetime import timedelta, datetime
 import os
+# This will attempt to import the config.py, and ignore if not yet created.
 try:
     import config
 except ModuleNotFoundError as error:
     pass
-
 
 
 class User:
@@ -25,7 +25,6 @@ class User:
         if rest_result == '[]' or rest_result == None:
             return []
         else:
-           #print([repo_name for repo_name in rest_result])
             self.user_repos = [repo_name['name'] for repo_name in rest_result]
 
 
@@ -42,7 +41,7 @@ class User:
         # test time: 2017-05-01T11:30:24.321455
         # datetime.datetime.now().isoformat()
         params = {
-            'since': (datetime.today() - timedelta(days=3)).isoformat(),
+            'since': (datetime.today() - timedelta(days=1)).isoformat(),
         }
         repo_commit_url = 'https://api.github.com/repos/' + self.username + '/' + repository_name + '/commits'
         result = self.auth_instance.api_get(repo_commit_url, params)
@@ -63,15 +62,9 @@ class User:
                         results.append(commit['commit'])
                 else:
                     pass
-            print(len(results))
             return results
         else:
             return None
-
-    @staticmethod
-    def count_repository_commits(repo_commit_results):
-        """WIP: """
-        len([commit for commit in repo_commit_results])
 
 
 class Instance:
