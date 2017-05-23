@@ -3,8 +3,7 @@ Title: Git Commit Monitor
 Author: Darius Strasel strasel.darius@gmail.com
 """
 
-import models
-import argparse
+import git_models
 import pprint
 import random
 from twilio_client import main as send_sms
@@ -63,21 +62,21 @@ def parse_input_commands():
     return args
 
 
-def main():
+def main(event, context):
     """Process input arguments, get user config settings,
      create User/Instance class instances, and get the commit history for the user.
      """
     # Get input arguments, create api instance (checks for secrets info)
-    input_arguments = parse_input_commands()
-    auth_instance = models.Instance()
+    #input_arguments = parse_input_commands()
+    auth_instance = git_models.Instance()
 
-    queried_user = input_arguments['username']
+    queried_user = 'dariusstrasel'#input_arguments['username']
 
     # Create User instance and pass in CLI user, followed by an auth instance
-    user = models.User(queried_user, auth_instance)
+    user = git_models.User(queried_user, auth_instance)
     user.get_user_repositories()
 
-    pp = pprint.PrettyPrinter(indent=4)
+    #pp = pprint.PrettyPrinter(indent=4)
 
     if user.user_repos:
 
@@ -86,12 +85,7 @@ def main():
         message = format_sms_message(commit_length)
         send_sms(message)
         #print(data)
-        pp.pprint(data)
+        #pp.pprint(data)
 
     else:
-        print("No results returned from API.")
         return "No results returned from API."
-
-
-if __name__ == "__main__":
-    main()
