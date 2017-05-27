@@ -5,7 +5,9 @@ Author: Darius Strasel strasel.darius@gmail.com
 
 import git_models
 import pprint
+import argparse
 import random
+import time
 from twilio_client import main as send_sms
 
 
@@ -23,6 +25,7 @@ def format_sms_message(commit_length):
             "“Do What You Can With All You Have, Wherever You Are.”- Theodore Roosevelt",
         ]
     commit_dictionary = {
+        # Each key represents a commit_length.
         0: ["Hey! You committed %s times today: aka you didn't commit today. You can do this!",
             "I noticed you didn't commit today! (%s times) You probably noticed too... keep pushing!",
             "You committed %s times today. C'mon! You can do it!"
@@ -34,12 +37,15 @@ def format_sms_message(commit_length):
         "Congrats! You committed %s times today!",
         "Keep it up! You completed %s code commits today!"]
     }
+
     def pick_message(custom=False):
-        if custom:
+        # Use custom if commit count is greater than 1.
+        if commit_length >= 2:
             message = (random.choice((commit_dictionary[2])) % (custom))
         else:
             message = (random.choice((commit_dictionary[commit_length])) % (commit_length))
         return message
+
     if commit_length == 0:
         message = pick_message() + random.choice(quotes)
         return message
@@ -66,26 +72,26 @@ def main(event, context):
     """Process input arguments, get user config settings,
      create User/Instance class instances, and get the commit history for the user.
      """
+
     # Get input arguments, create api instance (checks for secrets info)
-    #input_arguments = parse_input_commands()
+    print("%s: Lambda executing main:")
+    print("Event: %s" % (event))
+    print("Context: %s" % (context))
+    input_arguments = parse_input_commands()
+
     auth_instance = git_models.Instance()
 
-    queried_user = 'dariusstrasel'#input_arguments['username']
+    queried_user = input_arguments['username']
 
     # Create User instance and pass in CLI user, followed by an auth instance
     user = git_models.User(queried_user, auth_instance)
     user.get_user_repositories()
 
-    #pp = pprint.PrettyPrinter(indent=4)
-
     if user.user_repos:
-
-        data = user.get_user_commit_history()
-        commit_length = len(data)
+        commits = user.get_user_commit_history()
+        commit_length = len(commits)
         message = format_sms_message(commit_length)
         send_sms(message)
-        #print(data)
-        #pp.pprint(data)
 
     else:
         return "No results returned from API."

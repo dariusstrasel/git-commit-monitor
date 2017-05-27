@@ -1,0 +1,27 @@
+{
+  "name": "GitCommitMonitor",
+  "description": "Queries the user's commits and texts them based on their progress.",
+  "region": "us-east-1",
+  "runtime": "python3.6",
+  "handler": "git_monitor.main",
+  "role": "arn:aws:iam::00000000000:role/lambda_basic_execution",
+  "requirements": ["pygithub"],
+  "ignore": [
+    "circle\\.yml$",
+    "\\.git$",
+    "/.*\\.pyc$"
+  ],
+  "timeout": 30,
+  "memory": 512,
+  "vpc": {
+    "subnets": [
+      "subnet-00000000"
+    ],
+    "security_groups": [
+      "sg-00000000"
+    ]
+  },
+  "tracing": {
+    "Mode": "Active"
+  }
+}
